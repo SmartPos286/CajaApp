@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- Base background gradient: Deep Slate to Royal Indigo -->
+    <path android:pathData="M0,0h108v108h-108z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="0"
+                android:startY="0"
+                android:endX="108"
+                android:endY="108">
+                <item android:offset="0.0" android:color="#0F172A" />
+                <item android:offset="0.45" android:color="#1E1B4B" />
+                <item android:offset="1.0" android:color="#312E81" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Top-left ambient glow (Indigo) -->
+    <path android:pathData="M0,0 L70,0 L35,70 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="radial"
+                android:centerX="28"
+                android:centerY="24"
+                android:gradientRadius="48">
+                <item android:offset="0.0" android:color="#4D6366F1" />
+                <item android:offset="1.0" android:color="#00000000" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Bottom-right ambient glow (Electric Sky Blue) -->
+    <path android:pathData="M40,50 L108,50 L108,108 L40,108 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="radial"
+                android:centerX="80"
+                android:centerY="78"
+                android:gradientRadius="44">
+                <item android:offset="0.0" android:color="#3B38BDF8" />
+                <item android:offset="1.0" android:color="#00000000" />
+            </gradient>
+        </aapt:attr>
+    </path>
+</vector>

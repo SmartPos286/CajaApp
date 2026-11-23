@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- 1. PAYMENT CARD (Behind terminal on left) -->
+    <!-- Card Body -->
+    <path
+        android:pathData="M22,43 h16 c1.66,0 3,1.34 3,3 v9 c0,1.66 -1.34,3 -3,3 h-16 c-1.66,0 -3,-1.34 -3,-3 v-9 c0,-1.66 1.34,-3 3,-3 z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="19"
+                android:startY="43"
+                android:endX="41"
+                android:endY="58">
+                <item android:offset="0.0" android:color="#38BDF8" />
+                <item android:offset="1.0" android:color="#0284C7" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Card Magnetic Stripe / Cutout -->
+    <path
+        android:fillColor="#0F172A"
+        android:pathData="M19,46 h22 v2.5 h-22 z" />
+
+    <!-- Card Smart Chip / Indicator -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M23,50 h4 c0.55,0 1,0.45 1,1 v1.5 c0,0.55 -0.45,1 -1,1 h-4 c-0.55,0 -1,-0.45 -1,-1 v-1.5 c0,-0.55 0.45,-1 1,-1 z" />
+    <path
+        android:fillColor="#F8FAFC"
+        android:pathData="M29.5,51 h3.5 v1.5 h-3.5 z" />
+
+    <!-- 2. RECEIPT PAPER (Unrolling from top of POS terminal) -->
+    <!-- Paper Sheet -->
+    <path
+        android:pathData="M43,38 L43,26 C43,24 45,22.5 48,22.5 L54,22.5 C57,22.5 59.5,23.5 61,25.5 C62.2,27 61.5,29 59.5,29.5 L57,30 L57,38 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="43"
+                android:startY="22"
+                android:endX="61"
+                android:endY="38">
+                <item android:offset="0.0" android:color="#FFFFFF" />
+                <item android:offset="1.0" android:color="#E2E8F0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Paper Curl / Fold Edge -->
+    <path
+        android:fillColor="#CBD5E1"
+        android:pathData="M54,22.5 C57,22.5 59.5,23.5 61,25.5 C62.2,27 61.5,29 59.5,29.5 C57.5,29 56,26.5 54,22.5 Z" />
+
+    <!-- Printed Receipt Detail Lines (Indigo & Sky Blue) -->
+    <path
+        android:fillColor="#6366F1"
+        android:pathData="M46,26 h6 v1.5 h-6 z" />
+    <path
+        android:fillColor="#38BDF8"
+        android:pathData="M46,29 h4.5 v1.5 h-4.5 z" />
+    <path
+        android:fillColor="#6366F1"
+        android:pathData="M46,32 h6 v1.5 h-6 z" />
+    <path
+        android:fillColor="#94A3B8"
+        android:pathData="M46,35 h3.5 v1.2 h-3.5 z" />
+
+    <!-- 3. POS TERMINAL BODY (Datáfono) -->
+    <!-- Drop Shadow / 3D Bevel of Terminal -->
+    <path
+        android:pathData="M39,36 C44,33 52,33 57,36 C61,39 61,43 57,47 L53,52 L46,74 C44,78 40,79 36,78 L29,76 C26,75 25,72 26,69 L36,44 C37,40 38,37 39,36 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="26"
+                android:startY="34"
+                android:endX="60"
+                android:endY="78">
+                <item android:offset="0.0" android:color="#4338CA" />
+                <item android:offset="1.0" android:color="#1E1B4B" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Terminal Main White Housing (Crisp Silhouette) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M38,36 C42.5,33.5 50,33.5 55,36 C59,38.5 59,42.5 55.5,46 L51.5,51 L44.5,73 C42.5,76.5 39,77.5 35.5,76.5 L29,74.5 C26.5,73.5 25.5,71 26.5,68.5 L36,44 C36.8,40 37.2,37 38,36 Z" />
+
+    <!-- Terminal Display Screen (Deep slate with glowing Sky Blue interface) -->
+    <path
+        android:fillColor="#0F172A"
+        android:pathData="M37.5,44 L49,41 C50.5,40.6 51.5,41.5 51,42.8 L48.5,50 C48,51.2 46.8,51.8 45.3,52.2 L34.5,55 C33.2,55.3 32.2,54.4 32.7,53.2 L35.2,46 C35.7,44.8 36.5,44.2 37.5,44 Z" />
+
+    <!-- Screen Status & Data Glow on Display -->
+    <path
+        android:fillColor="#38BDF8"
+        android:pathData="M37.5,45.5 L46.5,43.2 L46,44.7 L37,47 Z" />
+    <path
+        android:fillColor="#10B981"
+        android:pathData="M36,48.5 L42,47 L41.6,48.2 L35.6,49.7 Z" />
+
+    <!-- Keypad Keys (12 buttons organized in 4 rows x 3 columns) -->
+    <!-- Row 1 -->
+    <path android:fillColor="#6366F1" android:pathData="M33,56.5 L35.5,55.8 c0.4,-0.1 0.7,0.1 0.6,0.5 L35.7,58 c-0.1,0.4 -0.4,0.6 -0.8,0.7 L32.4,59.4 c-0.4,0.1 -0.7,-0.1 -0.6,-0.5 L32.2,57.2 c0.1,-0.4 0.4,-0.6 0.8,-0.7 Z" />
+    <path android:fillColor="#6366F1" android:pathData="M37,55.5 L39.5,54.8 c0.4,-0.1 0.7,0.1 0.6,0.5 L39.7,57 c-0.1,0.4 -0.4,0.6 -0.8,0.7 L36.4,58.4 c-0.4,0.1 -0.7,-0.1 -0.6,-0.5 L36.2,56.2 c0.1,-0.4 0.4,-0.6 0.8,-0.7 Z" />
+    <path android:fillColor="#6366F1" android:pathData="M41,54.5 L43.5,53.8 c0.4,-0.1 0.7,0.1 0.6,0.5 L43.7,56 c-0.1,0.4 -0.4,0.6 -0.8,0.7 L40.4,57.4 c-0.4,0.1 -0.7,-0.1 -0.6,-0.5 L40.2,55.2 c0.1,-0.4 0.4,-0.6 0.8,-0.7 Z" />
+
+    <!-- Row 2 -->
+    <path android:fillColor="#6366F1" android:pathData="M31.5,60.5 L34,59.8 c0.4,-0.1 0.7,0.1 0.6,0.5 L34.2,62 c-0.1,0.4 -0.4,0.6 -0.8,0.7 L30.9,63.4 c-0.4,0.1 -0.7,-0.1 -0.6,-0.5 L30.7,61.2 c0.1,-0.4 0.4,-0.6 0.8,-0.7 Z" />
+    <path android:fillColor="#6366F1" android:pathData="M35.5,59.5 L38,58.8 c0.4,-0.1 0.7,0.1 0.6,0.5 L38.2,61 c-0.1,0.4 -0.4,0.6 -0.8,0.7 L34.9,62.4 c-0.4,0.1 -0.7,-0.1 -0.6,-0.5 L34.7,60.2 c0.1,-0.4 0.4,-0.6 0.8,-0.7 Z" />
+    <path android:fillColor="#6366F1" android:pathData="M39.5,58.5 L42,57.8 c0.4,-0.1 0.7,0.1 0.6,0.5 L42.2,60 c-0.1,0.4 -0.4,0.6 -0.8,0.7 L38.9,61.4 c-0.4,0.1 -0.7,-0.1 -0.6,-0.5 L38.7,59.2 c0.1,-0.4 0.4,-0.6 0.8,-0.7 Z" />
+
+    <!-- Row 3 -->
+    <path android:fillColor="#6366F1" android:pathData="M30,64.5 L32.5,63.8 c0.4,-0.1 0.7,0.1 0.6,0.5 L32.7,66 c-0.1,0.4 -0.4,0.6 -0.8,0.7 L29.4,67.4 c-0.4,0.1 -0.7,-0.1 -0.6,-0.5 L29.2,65.2 c0.1,-0.4 0.4,-0.6 0.8,-0.7 Z" />
+    <path android:fillColor="#6366F1" android:pathData="M34,63.5 L36.5,62.8 c0.4,-0.1 0.7,0.1 0.6,0.5 L36.7,65 c-0.1,0.4 -0.4,0.6 -0.8,0.7 L33.4,66.4 c-0.4,0.1 -0.7,-0.1 -0.6,-0.5 L33.2,64.2 c0.1,-0.4 0.4,-0.6 0.8,-0.7 Z" />
+    <path android:fillColor="#6366F1" android:pathData="M38,62.5 L40.5,61.8 c0.4,-0.1 0.7,0.1 0.6,0.5 L40.7,64 c-0.1,0.4 -0.4,0.6 -0.8,0.7 L37.4,65.4 c-0.4,0.1 -0.7,-0.1 -0.6,-0.5 L37.2,63.2 c0.1,-0.4 0.4,-0.6 0.8,-0.7 Z" />
+
+    <!-- Row 4 (Enter / Action keys in Sky Blue) -->
+    <path android:fillColor="#38BDF8" android:pathData="M28.5,68.5 L31,67.8 c0.4,-0.1 0.7,0.1 0.6,0.5 L31.2,70 c-0.1,0.4 -0.4,0.6 -0.8,0.7 L27.9,71.4 c-0.4,0.1 -0.7,-0.1 -0.6,-0.5 L27.7,69.2 c0.1,-0.4 0.4,-0.6 0.8,-0.7 Z" />
+    <path android:fillColor="#38BDF8" android:pathData="M32.5,67.5 L35,66.8 c0.4,-0.1 0.7,0.1 0.6,0.5 L35.2,69 c-0.1,0.4 -0.4,0.6 -0.8,0.7 L31.9,70.4 c-0.4,0.1 -0.7,-0.1 -0.6,-0.5 L31.7,68.2 c0.1,-0.4 0.4,-0.6 0.8,-0.7 Z" />
+    <path android:fillColor="#10B981" android:pathData="M36.5,66.5 L39,65.8 c0.4,-0.1 0.7,0.1 0.6,0.5 L39.2,68 c-0.1,0.4 -0.4,0.6 -0.8,0.7 L35.9,69.4 c-0.4,0.1 -0.7,-0.1 -0.6,-0.5 L35.7,67.2 c0.1,-0.4 0.4,-0.6 0.8,-0.7 Z" />
+
+    <!-- 4. NUMERALS "286" (Bold, Stylized, High-Contrast White with Sky Blue Accents) -->
+    <!-- Subtle 3D Shadow for "286" -->
+    <group android:translateX="0.8" android:translateY="1.2">
+        <!-- Shadow for 2 -->
+        <path
+            android:fillColor="#221E1B4B"
+            android:pathData="M44.5,52.5 C44.5,48 48,45 53.5,45 C58.5,45 61.5,47.8 61.5,51.5 C61.5,55 58,58.5 53,63.5 L57,63.5 C59,63.5 60.5,63.5 61.5,63.8 L61.5,69 L45,69 L45,64.5 L52.5,57 C55,54.5 56.5,53 56.5,51 C56.5,49.2 55.2,48.2 53.2,48.2 C51,48.2 49.5,49.5 49.2,52 L44.5,52.5 Z" />
+        <!-- Shadow for 8 -->
+        <path
+            android:fillColor="#221E1B4B"
+            android:pathData="M67.5,56.2 C69.5,55.2 70.8,53.2 70.8,50.8 C70.8,47.2 67.8,45 63.8,45 C59.8,45 56.8,47.2 56.8,50.8 C56.8,53.2 58.1,55.2 60.1,56.2 C57.5,57.5 55.8,60.2 55.8,63.2 C55.8,67.2 59.2,69.5 63.8,69.5 C68.4,69.5 71.8,67.2 71.8,63.2 C71.8,60.2 70.1,57.5 67.5,56.2 Z M63.8,48.2 C65.5,48.2 66.8,49.3 66.8,51 C66.8,52.7 65.5,53.8 63.8,53.8 C62.1,53.8 60.8,52.7 60.8,51 C60.8,49.3 62.1,48.2 63.8,48.2 Z M63.8,66 C61.5,66 59.8,64.7 59.8,62.8 C59.8,60.9 61.5,59.6 63.8,59.6 C66.1,59.6 67.8,60.9 67.8,62.8 C67.8,64.7 66.1,66 63.8,66 Z" />
+        <!-- Shadow for 6 -->
+        <path
+            android:fillColor="#221E1B4B"
+            android:pathData="M80,45 L75.5,46.5 C72.5,49.5 70.2,54.5 70,60 C71.5,58 74,56.8 77,56.8 C81.8,56.8 85.5,59.8 85.5,64.2 C85.5,68 82,70.5 77.2,70.5 C71.5,70.5 66.8,66.2 66.8,58.8 C66.8,50.5 72,45 80,45 Z M77,66.8 C79.5,66.8 81.5,65.5 81.5,63.8 C81.5,62.1 79.5,60.8 77,60.8 C74.5,60.8 72.5,62.1 72.5,63.8 C72.5,65.5 74.5,66.8 77,66.8 Z" />
+    </group>
+
+    <!-- DIGIT '2' -->
+    <path
+        android:pathData="M44.5,52.5 C44.5,48 48,45 53.5,45 C58.5,45 61.5,47.8 61.5,51.5 C61.5,55 58,58.5 53,63.5 L57,63.5 C59,63.5 60.5,63.5 61.5,63.8 L61.5,69 L45,69 L45,64.5 L52.5,57 C55,54.5 56.5,53 56.5,51 C56.5,49.2 55.2,48.2 53.2,48.2 C51,48.2 49.5,49.5 49.2,52 L44.5,52.5 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="44"
+                android:startY="45"
+                android:endX="62"
+                android:endY="69">
+                <item android:offset="0.0" android:color="#FFFFFF" />
+                <item android:offset="1.0" android:color="#F1F5F9" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- DIGIT '8' -->
+    <path
+        android:pathData="M67.5,56.2 C69.5,55.2 70.8,53.2 70.8,50.8 C70.8,47.2 67.8,45 63.8,45 C59.8,45 56.8,47.2 56.8,50.8 C56.8,53.2 58.1,55.2 60.1,56.2 C57.5,57.5 55.8,60.2 55.8,63.2 C55.8,67.2 59.2,69.5 63.8,69.5 C68.4,69.5 71.8,67.2 71.8,63.2 C71.8,60.2 70.1,57.5 67.5,56.2 Z M63.8,48.2 C65.5,48.2 66.8,49.3 66.8,51 C66.8,52.7 65.5,53.8 63.8,53.8 C62.1,53.8 60.8,52.7 60.8,51 C60.8,49.3 62.1,48.2 63.8,48.2 Z M63.8,66 C61.5,66 59.8,64.7 59.8,62.8 C59.8,60.9 61.5,59.6 63.8,59.6 C66.1,59.6 67.8,60.9 67.8,62.8 C67.8,64.7 66.1,66 63.8,66 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="56"
+                android:startY="45"
+                android:endX="72"
+                android:endY="69">
+                <item android:offset="0.0" android:color="#FFFFFF" />
+                <item android:offset="1.0" android:color="#F1F5F9" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- DIGIT '6' -->
+    <path
+        android:pathData="M80,45 L75.5,46.5 C72.5,49.5 70.2,54.5 70,60 C71.5,58 74,56.8 77,56.8 C81.8,56.8 85.5,59.8 85.5,64.2 C85.5,68 82,70.5 77.2,70.5 C71.5,70.5 66.8,66.2 66.8,58.8 C66.8,50.5 72,45 80,45 Z M77,66.8 C79.5,66.8 81.5,65.5 81.5,63.8 C81.5,62.1 79.5,60.8 77,60.8 C74.5,60.8 72.5,62.1 72.5,63.8 C72.5,65.5 74.5,66.8 77,66.8 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="66"
+                android:startY="45"
+                android:endX="86"
+                android:endY="70">
+                <item android:offset="0.0" android:color="#FFFFFF" />
+                <item android:offset="1.0" android:color="#F1F5F9" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Accent Sky Blue Glow Dot on 286 (Fintech Signature Spark) -->
+    <path
+        android:fillColor="#38BDF8"
+        android:pathData="M84.5,46.5 a1.5,1.5 0 1,0 3,0 a1.5,1.5 0 1,0 -3,0" />
+
+</vector>

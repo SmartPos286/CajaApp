@@ -1,0 +1,467 @@
+{
+  "entities": {
+    "UserAccount": {
+      "title": "UserAccount",
+      "description": "Authenticated Google account root record for multi-device POS synchronization.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Firebase Auth UID of the signed-in Google account." },
+        "email": { "type": "string", "description": "Google email address." },
+        "displayName": { "type": "string", "description": "Google account display name." },
+        "lastActiveAt": { "type": "string", "format": "date-time", "description": "Server timestamp of last activity." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server creation timestamp." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server update timestamp." }
+      },
+      "required": ["userId", "email", "displayName", "lastActiveAt", "createdAt", "updatedAt"]
+    },
+    "CompanyProfile": {
+      "title": "CompanyProfile",
+      "description": "Store profile, tax ID, BCV exchange rate, and POS settings synchronized across devices.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "googleEmail": { "type": "string" },
+        "storeName": { "type": "string" },
+        "storeRif": { "type": "string" },
+        "storePhone": { "type": "string" },
+        "storeAddress": { "type": "string" },
+        "bcvRate": { "type": "number" },
+        "minProfitMarginEnabled": { "type": "boolean" },
+        "minProfitMarginPercent": { "type": "number" },
+        "cashRegisterCommissionEnabled": { "type": "boolean" },
+        "commissionEnabledRegisters": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "userId", "googleEmail", "storeName", "storeRif", "storePhone", "storeAddress",
+        "bcvRate", "minProfitMarginEnabled", "minProfitMarginPercent",
+        "cashRegisterCommissionEnabled", "commissionEnabledRegisters", "createdAt", "updatedAt"
+      ]
+    },
+    "FsProduct": {
+      "title": "FsProduct",
+      "description": "Shared real-time inventory product synced across all devices on the same Google account.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "code": { "type": "string" },
+        "name": { "type": "string" },
+        "category": { "type": "string" },
+        "priceUsd": { "type": "number" },
+        "stock": { "type": "number" },
+        "costPriceUsd": { "type": "number" },
+        "invoiceNumber": { "type": "string" },
+        "taxExempt": { "type": "boolean" },
+        "hasCommission": { "type": "boolean" },
+        "commissionPercentage": { "type": "number" },
+        "commissionAmountUsd": { "type": "number" },
+        "recipe": { "type": "boolean" },
+        "combo": { "type": "boolean" },
+        "comboItemsJson": { "type": "string" },
+        "allowDecimalQuantity": { "type": "boolean" },
+        "priceModifiable": { "type": "boolean" },
+        "wholesalePriceUsd": { "type": "number" },
+        "aisleNumber": { "type": "string" },
+        "aisleQuantity": { "type": "number" },
+        "depotQuantity": { "type": "number" },
+        "counterQuantity": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "userId", "code", "name", "category", "priceUsd", "stock", "costPriceUsd", "invoiceNumber",
+        "taxExempt", "hasCommission", "commissionPercentage", "commissionAmountUsd", "recipe",
+        "combo", "comboItemsJson", "allowDecimalQuantity", "priceModifiable", "wholesalePriceUsd",
+        "aisleNumber", "aisleQuantity", "depotQuantity", "counterQuantity", "createdAt", "updatedAt"
+      ]
+    },
+    "FsSale": {
+      "title": "FsSale",
+      "description": "Completed POS sale recorded atomically with stock deduction.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "customerName": { "type": "string" },
+        "customerDocument": { "type": "string" },
+        "timestampMs": { "type": "integer" },
+        "rateBcv": { "type": "number" },
+        "totalUsd": { "type": "number" },
+        "totalBs": { "type": "number" },
+        "paymentCashUsd": { "type": "number" },
+        "paymentMobileBs": { "type": "number" },
+        "paymentCardBs": { "type": "number" },
+        "paymentCreditUsd": { "type": "number" },
+        "paymentCasheaUsd": { "type": "number" },
+        "creditPaid": { "type": "boolean" },
+        "creditPaidAmountUsd": { "type": "number" },
+        "creditDueDate": { "type": "integer" },
+        "creditNotes": { "type": "string" },
+        "igtfUsd": { "type": "number" },
+        "igtfBs": { "type": "number" },
+        "baseTaxableUsd": { "type": "number" },
+        "baseExemptUsd": { "type": "number" },
+        "ivaUsd": { "type": "number" },
+        "discountUsd": { "type": "number" },
+        "cashierName": { "type": "string" },
+        "cashRegisterNumber": { "type": "string" },
+        "totalCommissionUsd": { "type": "number" },
+        "retencionIvaUsd": { "type": "number" },
+        "retencionIvaPercentage": { "type": "number" },
+        "retencionIslrUsd": { "type": "number" },
+        "retencionIslrPercentage": { "type": "number" },
+        "withholdingVoucherNumber": { "type": "string" },
+        "withholdingStatus": { "type": "string" },
+        "deviceId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "userId", "customerName", "customerDocument", "timestampMs", "rateBcv", "totalUsd", "totalBs",
+        "paymentCashUsd", "paymentMobileBs", "paymentCardBs", "paymentCreditUsd", "paymentCasheaUsd",
+        "creditPaid", "creditPaidAmountUsd", "creditDueDate", "creditNotes", "igtfUsd", "igtfBs",
+        "baseTaxableUsd", "baseExemptUsd", "ivaUsd", "discountUsd", "cashierName", "cashRegisterNumber",
+        "totalCommissionUsd", "retencionIvaUsd", "retencionIvaPercentage", "retencionIslrUsd",
+        "retencionIslrPercentage", "withholdingVoucherNumber", "withholdingStatus", "deviceId",
+        "createdAt", "updatedAt"
+      ]
+    },
+    "FsSaleItem": {
+      "title": "FsSaleItem",
+      "description": "Line item belonging to a sale.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "saleCloudId": { "type": "string" },
+        "productCloudId": { "type": "string" },
+        "productName": { "type": "string" },
+        "quantity": { "type": "number" },
+        "priceUsd": { "type": "number" },
+        "taxExempt": { "type": "boolean" },
+        "commissionUsd": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "userId", "saleCloudId", "productCloudId", "productName", "quantity",
+        "priceUsd", "taxExempt", "commissionUsd", "createdAt", "updatedAt"
+      ]
+    },
+    "FsCustomer": {
+      "title": "FsCustomer",
+      "description": "Registered customer for invoicing and credit tracking.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "documentId": { "type": "string" },
+        "address": { "type": "string" },
+        "phone": { "type": "string" },
+        "clientType": { "type": "string" },
+        "withholdingAgent": { "type": "boolean" },
+        "ivaRetentionPercentage": { "type": "number" },
+        "islrRetentionPercentage": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "userId", "name", "documentId", "address", "phone", "clientType",
+        "withholdingAgent", "ivaRetentionPercentage", "islrRetentionPercentage",
+        "createdAt", "updatedAt"
+      ]
+    },
+    "FsQuote": {
+      "title": "FsQuote",
+      "description": "Customer price quote / estimate.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "quoteNumber": { "type": "string" },
+        "customerName": { "type": "string" },
+        "customerDocument": { "type": "string" },
+        "customerPhone": { "type": "string" },
+        "timestampMs": { "type": "integer" },
+        "validityDays": { "type": "integer" },
+        "validUntil": { "type": "integer" },
+        "rateBcv": { "type": "number" },
+        "baseTaxableUsd": { "type": "number" },
+        "baseExemptUsd": { "type": "number" },
+        "ivaUsd": { "type": "number" },
+        "discountUsd": { "type": "number" },
+        "totalUsd": { "type": "number" },
+        "totalBs": { "type": "number" },
+        "notesOrConditions": { "type": "string" },
+        "status": { "type": "string", "enum": ["VIGENTE", "ACEPTADO", "FACTURADO", "ANULADO"] },
+        "cashierName": { "type": "string" },
+        "cashRegisterNumber": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "userId", "quoteNumber", "customerName", "customerDocument", "customerPhone",
+        "timestampMs", "validityDays", "validUntil", "rateBcv", "baseTaxableUsd", "baseExemptUsd",
+        "ivaUsd", "discountUsd", "totalUsd", "totalBs", "notesOrConditions", "status",
+        "cashierName", "cashRegisterNumber", "createdAt", "updatedAt"
+      ]
+    },
+    "FsQuoteItem": {
+      "title": "FsQuoteItem",
+      "description": "Line item belonging to a customer quote.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "quoteCloudId": { "type": "string" },
+        "productCloudId": { "type": "string" },
+        "productName": { "type": "string" },
+        "quantity": { "type": "number" },
+        "priceUsd": { "type": "number" },
+        "taxExempt": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "userId", "quoteCloudId", "productCloudId", "productName",
+        "quantity", "priceUsd", "taxExempt", "createdAt", "updatedAt"
+      ]
+    },
+    "FsDeliveryNote": {
+      "title": "FsDeliveryNote",
+      "description": "Delivery dispatch note synced across devices.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "noteNumber": { "type": "string" },
+        "customerName": { "type": "string" },
+        "customerDocument": { "type": "string" },
+        "recipientName": { "type": "string" },
+        "reasonOrObservation": { "type": "string" },
+        "timestampMs": { "type": "integer" },
+        "totalEstimatedUsd": { "type": "number" },
+        "totalEstimatedBs": { "type": "number" },
+        "rateBcv": { "type": "number" },
+        "status": { "type": "string", "enum": ["ENTREGADO", "FACTURADO", "ANULADO"] },
+        "cashierName": { "type": "string" },
+        "cashRegisterNumber": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "userId", "noteNumber", "customerName", "customerDocument", "recipientName",
+        "reasonOrObservation", "timestampMs", "totalEstimatedUsd", "totalEstimatedBs",
+        "rateBcv", "status", "cashierName", "cashRegisterNumber", "createdAt", "updatedAt"
+      ]
+    },
+    "FsDeliveryNoteItem": {
+      "title": "FsDeliveryNoteItem",
+      "description": "Line item belonging to a delivery note.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "deliveryNoteCloudId": { "type": "string" },
+        "productCloudId": { "type": "string" },
+        "productName": { "type": "string" },
+        "quantity": { "type": "number" },
+        "priceUsd": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "userId", "deliveryNoteCloudId", "productCloudId", "productName",
+        "quantity", "priceUsd", "createdAt", "updatedAt"
+      ]
+    },
+    "FsExpense": {
+      "title": "FsExpense",
+      "description": "Operating expense record synced across devices.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "category": { "type": "string" },
+        "invoiceNumber": { "type": "string" },
+        "amountUsd": { "type": "number" },
+        "amountBs": { "type": "number" },
+        "bcvRateUsed": { "type": "number" },
+        "paymentMethod": { "type": "string" },
+        "description": { "type": "string" },
+        "timestampMs": { "type": "integer" },
+        "registeredBy": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "userId", "category", "invoiceNumber", "amountUsd", "amountBs", "bcvRateUsed",
+        "paymentMethod", "description", "timestampMs", "registeredBy", "createdAt", "updatedAt"
+      ]
+    },
+    "FsSupplier": {
+      "title": "FsSupplier",
+      "description": "Supplier record synced across devices.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "documentId": { "type": "string" },
+        "phone": { "type": "string" },
+        "address": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "name", "documentId", "phone", "address", "createdAt", "updatedAt"]
+    },
+    "FsPurchaseInvoice": {
+      "title": "FsPurchaseInvoice",
+      "description": "Supplier purchase invoice synced across devices.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "supplierCloudId": { "type": "string" },
+        "invoiceNumber": { "type": "string" },
+        "timestampMs": { "type": "integer" },
+        "totalAmount": { "type": "number" },
+        "description": { "type": "string" },
+        "paid": { "type": "boolean" },
+        "paidTimestamp": { "type": "integer" },
+        "dueDate": { "type": "integer" },
+        "paymentNotes": { "type": "string" },
+        "subtotalUsd": { "type": "number" },
+        "taxAmountUsd": { "type": "number" },
+        "retencionIvaUsd": { "type": "number" },
+        "retencionIvaPercentage": { "type": "number" },
+        "retencionIslrUsd": { "type": "number" },
+        "retencionIslrPercentage": { "type": "number" },
+        "withholdingVoucherNumber": { "type": "string" },
+        "withholdingStatus": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "userId", "supplierCloudId", "invoiceNumber", "timestampMs", "totalAmount", "description",
+        "paid", "paidTimestamp", "dueDate", "paymentNotes", "subtotalUsd", "taxAmountUsd",
+        "retencionIvaUsd", "retencionIvaPercentage", "retencionIslrUsd", "retencionIslrPercentage",
+        "withholdingVoucherNumber", "withholdingStatus", "createdAt", "updatedAt"
+      ]
+    },
+    "FsPosUser": {
+      "title": "FsPosUser",
+      "description": "POS terminal operator profile synced under the Google account.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "username": { "type": "string" },
+        "pin": { "type": "string" },
+        "role": { "type": "string", "enum": ["ADMIN", "ADMINISTRADOR", "SUPERVISOR", "CASHIER", "CAJERO"] },
+        "avatarUrl": { "type": "string" },
+        "earnCommission": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "username", "pin", "role", "avatarUrl", "earnCommission", "createdAt", "updatedAt"]
+    },
+    "FsDevice": {
+      "title": "FsDevice",
+      "description": "Connected POS terminal device sharing the Google account database.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "deviceModel": { "type": "string" },
+        "googleEmail": { "type": "string" },
+        "lastActiveAt": { "type": "string", "format": "date-time" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "deviceModel", "googleEmail", "lastActiveAt", "createdAt", "updatedAt"]
+    },
+    "FsEncryptedBackup": {
+      "title": "FsEncryptedBackup",
+      "description": "AES-256-GCM encrypted JSON backup snapshot updated every 20 minutes per Google account.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "googleEmail": { "type": "string" },
+        "storeName": { "type": "string" },
+        "storeRif": { "type": "string" },
+        "deviceId": { "type": "string" },
+        "deviceModel": { "type": "string" },
+        "formatVersion": { "type": "integer" },
+        "productsCount": { "type": "integer" },
+        "salesCount": { "type": "integer" },
+        "customersCount": { "type": "integer" },
+        "exportedAtMs": { "type": "integer" },
+        "encryptedPayload": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "userId", "googleEmail", "storeName", "storeRif", "deviceId", "deviceModel",
+        "formatVersion", "productsCount", "salesCount", "customersCount",
+        "exportedAtMs", "encryptedPayload", "createdAt", "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserAccount" },
+      "description": "Root account document for the Google-authenticated business."
+    },
+    "/users/{userId}/company_profile/{profileId}": {
+      "schema": { "$ref": "#/entities/CompanyProfile" },
+      "description": "Company profile and POS settings synchronized across connected devices."
+    },
+    "/users/{userId}/products/{productId}": {
+      "schema": { "$ref": "#/entities/FsProduct" },
+      "description": "Shared real-time product catalog and stock levels."
+    },
+    "/users/{userId}/sales/{saleId}": {
+      "schema": { "$ref": "#/entities/FsSale" },
+      "description": "Completed POS sales synchronized in real time."
+    },
+    "/users/{userId}/sale_items/{itemId}": {
+      "schema": { "$ref": "#/entities/FsSaleItem" },
+      "description": "Individual sale line items."
+    },
+    "/users/{userId}/customers/{customerId}": {
+      "schema": { "$ref": "#/entities/FsCustomer" },
+      "description": "Customer directory."
+    },
+    "/users/{userId}/quotes/{quoteId}": {
+      "schema": { "$ref": "#/entities/FsQuote" },
+      "description": "Customer quotes and estimates."
+    },
+    "/users/{userId}/quote_items/{itemId}": {
+      "schema": { "$ref": "#/entities/FsQuoteItem" },
+      "description": "Individual quote line items."
+    },
+    "/users/{userId}/delivery_notes/{noteId}": {
+      "schema": { "$ref": "#/entities/FsDeliveryNote" },
+      "description": "Delivery dispatch notes."
+    },
+    "/users/{userId}/delivery_note_items/{itemId}": {
+      "schema": { "$ref": "#/entities/FsDeliveryNoteItem" },
+      "description": "Individual delivery note line items."
+    },
+    "/users/{userId}/expenses/{expenseId}": {
+      "schema": { "$ref": "#/entities/FsExpense" },
+      "description": "Business operating expenses."
+    },
+    "/users/{userId}/suppliers/{supplierId}": {
+      "schema": { "$ref": "#/entities/FsSupplier" },
+      "description": "Suppliers directory."
+    },
+    "/users/{userId}/purchase_invoices/{invoiceId}": {
+      "schema": { "$ref": "#/entities/FsPurchaseInvoice" },
+      "description": "Supplier purchase invoices."
+    },
+    "/users/{userId}/pos_users/{posUserId}": {
+      "schema": { "$ref": "#/entities/FsPosUser" },
+      "description": "POS operator profiles for cashiers and supervisors."
+    },
+    "/users/{userId}/devices/{deviceId}": {
+      "schema": { "$ref": "#/entities/FsDevice" },
+      "description": "Connected devices actively sharing the account database."
+    },
+    "/users/{userId}/encrypted_backups/{backupId}": {
+      "schema": { "$ref": "#/entities/FsEncryptedBackup" },
+      "description": "Latest AES-256-GCM encrypted JSON backup updated in-place every 20 minutes."
+    }
+  }
+}

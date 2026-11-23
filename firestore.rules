@@ -1,0 +1,773 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Safety Net: Default-deny all paths unless explicitly permitted below
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- GLOBAL HARDENED HELPERS ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidServerTimestampsOnCreate(data) {
+      return data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    function isValidServerTimestampsOnUpdate(data) {
+      return data.createdAt == existing().createdAt &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    // --- VALIDATION HELPERS ---
+
+    function isValidUserAccount(data) {
+      return data.userId is string && data.userId.size() > 0 && data.userId.size() <= 128 &&
+             data.email is string && data.email.size() <= 200 &&
+             data.displayName is string && data.displayName.size() <= 120 &&
+             data.lastActiveAt is timestamp && data.lastActiveAt <= request.time;
+    }
+
+    function isValidCompanyProfile(data) {
+      return data.userId is string && data.userId.size() > 0 && data.userId.size() <= 128 &&
+             data.googleEmail is string && data.googleEmail.size() <= 200 &&
+             data.storeName is string && data.storeName.size() <= 120 &&
+             data.storeRif is string && data.storeRif.size() <= 40 &&
+             data.storePhone is string && data.storePhone.size() <= 40 &&
+             data.storeAddress is string && data.storeAddress.size() <= 300 &&
+             data.bcvRate is number && data.bcvRate > 0 &&
+             data.minProfitMarginEnabled is bool &&
+             data.minProfitMarginPercent is number && data.minProfitMarginPercent >= 0 &&
+             data.cashRegisterCommissionEnabled is bool &&
+             data.commissionEnabledRegisters is string && data.commissionEnabledRegisters.size() <= 200;
+    }
+
+    function isValidProduct(data) {
+      return data.userId is string && data.userId.size() > 0 && data.userId.size() <= 128 &&
+             data.code is string && data.code.size() <= 80 &&
+             data.name is string && data.name.size() >= 1 && data.name.size() <= 200 &&
+             data.category is string && data.category.size() <= 80 &&
+             data.priceUsd is number && data.priceUsd >= 0 &&
+             data.stock is number && data.stock >= 0 &&
+             data.costPriceUsd is number && data.costPriceUsd >= 0 &&
+             data.invoiceNumber is string && data.invoiceNumber.size() <= 80 &&
+             data.taxExempt is bool &&
+             data.hasCommission is bool &&
+             data.commissionPercentage is number && data.commissionPercentage >= 0 &&
+             data.commissionAmountUsd is number && data.commissionAmountUsd >= 0 &&
+             data.recipe is bool &&
+             data.combo is bool &&
+             data.comboItemsJson is string && data.comboItemsJson.size() <= 4000 &&
+             data.allowDecimalQuantity is bool &&
+             data.priceModifiable is bool &&
+             data.wholesalePriceUsd is number && data.wholesalePriceUsd >= 0 &&
+             data.aisleNumber is string && data.aisleNumber.size() <= 40 &&
+             data.aisleQuantity is number && data.aisleQuantity >= 0 &&
+             data.depotQuantity is number && data.depotQuantity >= 0 &&
+             data.counterQuantity is number && data.counterQuantity >= 0;
+    }
+
+    function isValidSale(data) {
+      return data.userId is string && data.userId.size() > 0 && data.userId.size() <= 128 &&
+             data.customerName is string && data.customerName.size() <= 160 &&
+             data.customerDocument is string && data.customerDocument.size() <= 60 &&
+             data.timestampMs is number && data.timestampMs >= 0 &&
+             data.rateBcv is number && data.rateBcv > 0 &&
+             data.totalUsd is number && data.totalUsd >= 0 &&
+             data.totalBs is number && data.totalBs >= 0 &&
+             data.paymentCashUsd is number && data.paymentCashUsd >= 0 &&
+             data.paymentMobileBs is number && data.paymentMobileBs >= 0 &&
+             data.paymentCardBs is number && data.paymentCardBs >= 0 &&
+             data.paymentCreditUsd is number && data.paymentCreditUsd >= 0 &&
+             data.paymentCasheaUsd is number && data.paymentCasheaUsd >= 0 &&
+             data.creditPaid is bool &&
+             data.creditPaidAmountUsd is number && data.creditPaidAmountUsd >= 0 &&
+             data.creditDueDate is number && data.creditDueDate >= 0 &&
+             data.creditNotes is string && data.creditNotes.size() <= 500 &&
+             data.igtfUsd is number && data.igtfUsd >= 0 &&
+             data.igtfBs is number && data.igtfBs >= 0 &&
+             data.baseTaxableUsd is number && data.baseTaxableUsd >= 0 &&
+             data.baseExemptUsd is number && data.baseExemptUsd >= 0 &&
+             data.ivaUsd is number && data.ivaUsd >= 0 &&
+             data.discountUsd is number && data.discountUsd >= 0 &&
+             data.cashierName is string && data.cashierName.size() <= 80 &&
+             data.cashRegisterNumber is string && data.cashRegisterNumber.size() <= 40 &&
+             data.totalCommissionUsd is number && data.totalCommissionUsd >= 0 &&
+             data.retencionIvaUsd is number && data.retencionIvaUsd >= 0 &&
+             data.retencionIvaPercentage is number && data.retencionIvaPercentage >= 0 &&
+             data.retencionIslrUsd is number && data.retencionIslrUsd >= 0 &&
+             data.retencionIslrPercentage is number && data.retencionIslrPercentage >= 0 &&
+             data.withholdingVoucherNumber is string && data.withholdingVoucherNumber.size() <= 80 &&
+             data.withholdingStatus is string && data.withholdingStatus.size() <= 40 &&
+             data.deviceId is string && data.deviceId.size() <= 128;
+    }
+
+    function isValidSaleItem(data) {
+      return data.userId is string && data.userId.size() > 0 && data.userId.size() <= 128 &&
+             data.saleCloudId is string && data.saleCloudId.size() >= 1 && data.saleCloudId.size() <= 128 &&
+             data.productCloudId is string && data.productCloudId.size() <= 128 &&
+             data.productName is string && data.productName.size() >= 1 && data.productName.size() <= 200 &&
+             data.quantity is number && data.quantity >= 0 &&
+             data.priceUsd is number && data.priceUsd >= 0 &&
+             data.taxExempt is bool &&
+             data.commissionUsd is number && data.commissionUsd >= 0;
+    }
+
+    function isValidCustomer(data) {
+      return data.userId is string && data.userId.size() > 0 && data.userId.size() <= 128 &&
+             data.name is string && data.name.size() >= 1 && data.name.size() <= 160 &&
+             data.documentId is string && data.documentId.size() <= 60 &&
+             data.address is string && data.address.size() <= 300 &&
+             data.phone is string && data.phone.size() <= 40 &&
+             data.clientType is string && data.clientType.size() <= 40 &&
+             data.withholdingAgent is bool &&
+             data.ivaRetentionPercentage is number && data.ivaRetentionPercentage >= 0 &&
+             data.islrRetentionPercentage is number && data.islrRetentionPercentage >= 0;
+    }
+
+    function isValidQuote(data) {
+      return data.userId is string && data.userId.size() > 0 && data.userId.size() <= 128 &&
+             data.quoteNumber is string && data.quoteNumber.size() <= 40 &&
+             data.customerName is string && data.customerName.size() <= 160 &&
+             data.customerDocument is string && data.customerDocument.size() <= 60 &&
+             data.customerPhone is string && data.customerPhone.size() <= 40 &&
+             data.timestampMs is number && data.timestampMs >= 0 &&
+             data.validityDays is int && data.validityDays >= 1 && data.validityDays <= 3650 &&
+             data.validUntil is number && data.validUntil >= 0 &&
+             data.rateBcv is number && data.rateBcv > 0 &&
+             data.baseTaxableUsd is number && data.baseTaxableUsd >= 0 &&
+             data.baseExemptUsd is number && data.baseExemptUsd >= 0 &&
+             data.ivaUsd is number && data.ivaUsd >= 0 &&
+             data.discountUsd is number && data.discountUsd >= 0 &&
+             data.totalUsd is number && data.totalUsd >= 0 &&
+             data.totalBs is number && data.totalBs >= 0 &&
+             data.notesOrConditions is string && data.notesOrConditions.size() <= 500 &&
+             data.status in ['VIGENTE', 'ACEPTADO', 'FACTURADO', 'ANULADO'] &&
+             data.cashierName is string && data.cashierName.size() <= 80 &&
+             data.cashRegisterNumber is string && data.cashRegisterNumber.size() <= 40;
+    }
+
+    function isValidQuoteItem(data) {
+      return data.userId is string && data.userId.size() > 0 && data.userId.size() <= 128 &&
+             data.quoteCloudId is string && data.quoteCloudId.size() >= 1 && data.quoteCloudId.size() <= 128 &&
+             data.productCloudId is string && data.productCloudId.size() <= 128 &&
+             data.productName is string && data.productName.size() >= 1 && data.productName.size() <= 200 &&
+             data.quantity is number && data.quantity >= 0 &&
+             data.priceUsd is number && data.priceUsd >= 0 &&
+             data.taxExempt is bool;
+    }
+
+    function isValidDeliveryNote(data) {
+      return data.userId is string && data.userId.size() > 0 && data.userId.size() <= 128 &&
+             data.noteNumber is string && data.noteNumber.size() <= 40 &&
+             data.customerName is string && data.customerName.size() <= 160 &&
+             data.customerDocument is string && data.customerDocument.size() <= 60 &&
+             data.recipientName is string && data.recipientName.size() <= 160 &&
+             data.reasonOrObservation is string && data.reasonOrObservation.size() <= 400 &&
+             data.timestampMs is number && data.timestampMs >= 0 &&
+             data.totalEstimatedUsd is number && data.totalEstimatedUsd >= 0 &&
+             data.totalEstimatedBs is number && data.totalEstimatedBs >= 0 &&
+             data.rateBcv is number && data.rateBcv > 0 &&
+             data.status in ['ENTREGADO', 'FACTURADO', 'ANULADO'] &&
+             data.cashierName is string && data.cashierName.size() <= 80 &&
+             data.cashRegisterNumber is string && data.cashRegisterNumber.size() <= 40;
+    }
+
+    function isValidDeliveryNoteItem(data) {
+      return data.userId is string && data.userId.size() > 0 && data.userId.size() <= 128 &&
+             data.deliveryNoteCloudId is string && data.deliveryNoteCloudId.size() >= 1 && data.deliveryNoteCloudId.size() <= 128 &&
+             data.productCloudId is string && data.productCloudId.size() <= 128 &&
+             data.productName is string && data.productName.size() >= 1 && data.productName.size() <= 200 &&
+             data.quantity is number && data.quantity >= 0 &&
+             data.priceUsd is number && data.priceUsd >= 0;
+    }
+
+    function isValidExpense(data) {
+      return data.userId is string && data.userId.size() > 0 && data.userId.size() <= 128 &&
+             data.category is string && data.category.size() <= 100 &&
+             data.invoiceNumber is string && data.invoiceNumber.size() <= 80 &&
+             data.amountUsd is number && data.amountUsd >= 0 &&
+             data.amountBs is number && data.amountBs >= 0 &&
+             data.bcvRateUsed is number && data.bcvRateUsed > 0 &&
+             data.paymentMethod is string && data.paymentMethod.size() <= 60 &&
+             data.description is string && data.description.size() <= 400 &&
+             data.timestampMs is number && data.timestampMs >= 0 &&
+             data.registeredBy is string && data.registeredBy.size() <= 80;
+    }
+
+    function isValidSupplier(data) {
+      return data.userId is string && data.userId.size() > 0 && data.userId.size() <= 128 &&
+             data.name is string && data.name.size() >= 1 && data.name.size() <= 160 &&
+             data.documentId is string && data.documentId.size() <= 60 &&
+             data.phone is string && data.phone.size() <= 40 &&
+             data.address is string && data.address.size() <= 300;
+    }
+
+    function isValidPurchaseInvoice(data) {
+      return data.userId is string && data.userId.size() > 0 && data.userId.size() <= 128 &&
+             data.supplierCloudId is string && data.supplierCloudId.size() <= 128 &&
+             data.invoiceNumber is string && data.invoiceNumber.size() <= 80 &&
+             data.timestampMs is number && data.timestampMs >= 0 &&
+             data.totalAmount is number && data.totalAmount >= 0 &&
+             data.description is string && data.description.size() <= 400 &&
+             data.paid is bool &&
+             data.paidTimestamp is number && data.paidTimestamp >= 0 &&
+             data.dueDate is number && data.dueDate >= 0 &&
+             data.paymentNotes is string && data.paymentNotes.size() <= 400 &&
+             data.subtotalUsd is number && data.subtotalUsd >= 0 &&
+             data.taxAmountUsd is number && data.taxAmountUsd >= 0 &&
+             data.retencionIvaUsd is number && data.retencionIvaUsd >= 0 &&
+             data.retencionIvaPercentage is number && data.retencionIvaPercentage >= 0 &&
+             data.retencionIslrUsd is number && data.retencionIslrUsd >= 0 &&
+             data.retencionIslrPercentage is number && data.retencionIslrPercentage >= 0 &&
+             data.withholdingVoucherNumber is string && data.withholdingVoucherNumber.size() <= 80 &&
+             data.withholdingStatus is string && data.withholdingStatus.size() <= 40;
+    }
+
+    function isValidPosUser(data) {
+      return data.userId is string && data.userId.size() > 0 && data.userId.size() <= 128 &&
+             data.username is string && data.username.size() >= 1 && data.username.size() <= 80 &&
+             data.pin is string && data.pin.size() >= 1 && data.pin.size() <= 40 &&
+             data.role in ['ADMIN', 'ADMINISTRADOR', 'SUPERVISOR', 'CASHIER', 'CAJERO'] &&
+             data.avatarUrl is string && data.avatarUrl.size() <= 500 &&
+             data.earnCommission is bool;
+    }
+
+    function isValidDevice(data) {
+      return data.userId is string && data.userId.size() > 0 && data.userId.size() <= 128 &&
+             data.deviceModel is string && data.deviceModel.size() <= 120 &&
+             data.googleEmail is string && data.googleEmail.size() <= 200 &&
+             data.lastActiveAt is timestamp && data.lastActiveAt <= request.time;
+    }
+
+    function isValidEncryptedBackup(data) {
+      return data.userId is string && data.userId.size() > 0 && data.userId.size() <= 128 &&
+             data.googleEmail is string && data.googleEmail.size() <= 200 &&
+             data.storeName is string && data.storeName.size() <= 120 &&
+             data.storeRif is string && data.storeRif.size() <= 40 &&
+             data.deviceId is string && data.deviceId.size() <= 128 &&
+             data.deviceModel is string && data.deviceModel.size() <= 120 &&
+             data.formatVersion is int && data.formatVersion >= 1 && data.formatVersion <= 10 &&
+             data.productsCount is int && data.productsCount >= 0 &&
+             data.salesCount is int && data.salesCount >= 0 &&
+             data.customersCount is int && data.customersCount >= 0 &&
+             data.exportedAtMs is int && data.exportedAtMs >= 0 &&
+             data.encryptedPayload is string && data.encryptedPayload.size() > 0 && data.encryptedPayload.size() <= 950000;
+    }
+
+    // --- USER ACCOUNT ROOT & ISOLATED BUSINESS SUBCOLLECTIONS ---
+    match /users/{userId} {
+      allow get, list: if isOwner(userId);
+
+      allow create: if isOwner(userId) &&
+                       isValidId(userId) &&
+                       incoming().userId == request.auth.uid &&
+                       incoming().keys().hasAll(['userId', 'email', 'displayName', 'lastActiveAt', 'createdAt', 'updatedAt']) &&
+                       incoming().keys().hasOnly(['userId', 'email', 'displayName', 'lastActiveAt', 'createdAt', 'updatedAt']) &&
+                       isValidServerTimestampsOnCreate(incoming()) &&
+                       isValidUserAccount(incoming());
+
+      allow update: if isOwner(userId) &&
+                       isValidId(userId) &&
+                       isValidUserAccount(incoming()) &&
+                       incoming().userId == existing().userId &&
+                       isValidServerTimestampsOnUpdate(incoming()) &&
+                       incoming().diff(existing()).affectedKeys().hasOnly(['email', 'displayName', 'lastActiveAt', 'updatedAt']);
+
+      allow delete: if isOwner(userId) && isValidId(userId);
+
+      // 1. Company Profile
+      match /company_profile/{profileId} {
+        allow get: if isOwner(userId) && isValidId(profileId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+                         isValidId(profileId) &&
+                         incoming().userId == request.auth.uid &&
+                         incoming().keys().hasAll([
+                           'userId', 'googleEmail', 'storeName', 'storeRif', 'storePhone', 'storeAddress',
+                           'bcvRate', 'minProfitMarginEnabled', 'minProfitMarginPercent',
+                           'cashRegisterCommissionEnabled', 'commissionEnabledRegisters', 'createdAt', 'updatedAt'
+                         ]) &&
+                         incoming().keys().hasOnly([
+                           'userId', 'googleEmail', 'storeName', 'storeRif', 'storePhone', 'storeAddress',
+                           'bcvRate', 'minProfitMarginEnabled', 'minProfitMarginPercent',
+                           'cashRegisterCommissionEnabled', 'commissionEnabledRegisters', 'createdAt', 'updatedAt'
+                         ]) &&
+                         isValidServerTimestampsOnCreate(incoming()) &&
+                         isValidCompanyProfile(incoming());
+
+        allow update: if isOwner(userId) &&
+                         isValidId(profileId) &&
+                         isValidCompanyProfile(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         isValidServerTimestampsOnUpdate(incoming()) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly([
+                           'googleEmail', 'storeName', 'storeRif', 'storePhone', 'storeAddress',
+                           'bcvRate', 'minProfitMarginEnabled', 'minProfitMarginPercent',
+                           'cashRegisterCommissionEnabled', 'commissionEnabledRegisters', 'updatedAt'
+                         ]);
+
+        allow delete: if isOwner(userId) && isValidId(profileId);
+      }
+
+      // 2. Shared Real-Time Inventory Products
+      match /products/{productId} {
+        allow get: if isOwner(userId) && isValidId(productId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+                         isValidId(productId) &&
+                         incoming().userId == request.auth.uid &&
+                         incoming().keys().hasAll([
+                           'userId', 'code', 'name', 'category', 'priceUsd', 'stock', 'costPriceUsd', 'invoiceNumber',
+                           'taxExempt', 'hasCommission', 'commissionPercentage', 'commissionAmountUsd', 'recipe',
+                           'combo', 'comboItemsJson', 'allowDecimalQuantity', 'priceModifiable', 'wholesalePriceUsd',
+                           'aisleNumber', 'aisleQuantity', 'depotQuantity', 'counterQuantity', 'createdAt', 'updatedAt'
+                         ]) &&
+                         incoming().keys().hasOnly([
+                           'userId', 'code', 'name', 'category', 'priceUsd', 'stock', 'costPriceUsd', 'invoiceNumber',
+                           'taxExempt', 'hasCommission', 'commissionPercentage', 'commissionAmountUsd', 'recipe',
+                           'combo', 'comboItemsJson', 'allowDecimalQuantity', 'priceModifiable', 'wholesalePriceUsd',
+                           'aisleNumber', 'aisleQuantity', 'depotQuantity', 'counterQuantity', 'createdAt', 'updatedAt'
+                         ]) &&
+                         isValidServerTimestampsOnCreate(incoming()) &&
+                         isValidProduct(incoming());
+
+        allow update: if isOwner(userId) &&
+                         isValidId(productId) &&
+                         isValidProduct(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         isValidServerTimestampsOnUpdate(incoming()) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly([
+                           'code', 'name', 'category', 'priceUsd', 'stock', 'costPriceUsd', 'invoiceNumber',
+                           'taxExempt', 'hasCommission', 'commissionPercentage', 'commissionAmountUsd', 'recipe',
+                           'combo', 'comboItemsJson', 'allowDecimalQuantity', 'priceModifiable', 'wholesalePriceUsd',
+                           'aisleNumber', 'aisleQuantity', 'depotQuantity', 'counterQuantity', 'updatedAt'
+                         ]);
+
+        allow delete: if isOwner(userId) && isValidId(productId);
+      }
+
+      // 3. Real-Time POS Sales
+      match /sales/{saleId} {
+        allow get: if isOwner(userId) && isValidId(saleId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+                         isValidId(saleId) &&
+                         incoming().userId == request.auth.uid &&
+                         incoming().keys().hasAll([
+                           'userId', 'customerName', 'customerDocument', 'timestampMs', 'rateBcv', 'totalUsd', 'totalBs',
+                           'paymentCashUsd', 'paymentMobileBs', 'paymentCardBs', 'paymentCreditUsd', 'paymentCasheaUsd',
+                           'creditPaid', 'creditPaidAmountUsd', 'creditDueDate', 'creditNotes', 'igtfUsd', 'igtfBs',
+                           'baseTaxableUsd', 'baseExemptUsd', 'ivaUsd', 'discountUsd', 'cashierName', 'cashRegisterNumber',
+                           'totalCommissionUsd', 'retencionIvaUsd', 'retencionIvaPercentage', 'retencionIslrUsd',
+                           'retencionIslrPercentage', 'withholdingVoucherNumber', 'withholdingStatus', 'deviceId',
+                           'createdAt', 'updatedAt'
+                         ]) &&
+                         incoming().keys().hasOnly([
+                           'userId', 'customerName', 'customerDocument', 'timestampMs', 'rateBcv', 'totalUsd', 'totalBs',
+                           'paymentCashUsd', 'paymentMobileBs', 'paymentCardBs', 'paymentCreditUsd', 'paymentCasheaUsd',
+                           'creditPaid', 'creditPaidAmountUsd', 'creditDueDate', 'creditNotes', 'igtfUsd', 'igtfBs',
+                           'baseTaxableUsd', 'baseExemptUsd', 'ivaUsd', 'discountUsd', 'cashierName', 'cashRegisterNumber',
+                           'totalCommissionUsd', 'retencionIvaUsd', 'retencionIvaPercentage', 'retencionIslrUsd',
+                           'retencionIslrPercentage', 'withholdingVoucherNumber', 'withholdingStatus', 'deviceId',
+                           'createdAt', 'updatedAt'
+                         ]) &&
+                         isValidServerTimestampsOnCreate(incoming()) &&
+                         isValidSale(incoming());
+
+        allow update: if isOwner(userId) &&
+                         isValidId(saleId) &&
+                         isValidSale(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         isValidServerTimestampsOnUpdate(incoming()) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly([
+                           'creditPaid', 'creditPaidAmountUsd', 'creditNotes',
+                           'withholdingVoucherNumber', 'withholdingStatus', 'updatedAt'
+                         ]);
+
+        allow delete: if isOwner(userId) && isValidId(saleId);
+      }
+
+      // 4. Sale Line Items
+      match /sale_items/{itemId} {
+        allow get: if isOwner(userId) && isValidId(itemId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+                         isValidId(itemId) &&
+                         incoming().userId == request.auth.uid &&
+                         incoming().keys().hasAll([
+                           'userId', 'saleCloudId', 'productCloudId', 'productName', 'quantity',
+                           'priceUsd', 'taxExempt', 'commissionUsd', 'createdAt', 'updatedAt'
+                         ]) &&
+                         incoming().keys().hasOnly([
+                           'userId', 'saleCloudId', 'productCloudId', 'productName', 'quantity',
+                           'priceUsd', 'taxExempt', 'commissionUsd', 'createdAt', 'updatedAt'
+                         ]) &&
+                         isValidServerTimestampsOnCreate(incoming()) &&
+                         isValidSaleItem(incoming());
+
+        allow update: if isOwner(userId) &&
+                         isValidId(itemId) &&
+                         isValidSaleItem(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         isValidServerTimestampsOnUpdate(incoming()) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['quantity', 'priceUsd', 'updatedAt']);
+
+        allow delete: if isOwner(userId) && isValidId(itemId);
+      }
+
+      // 5. Customers
+      match /customers/{customerId} {
+        allow get: if isOwner(userId) && isValidId(customerId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+                         isValidId(customerId) &&
+                         incoming().userId == request.auth.uid &&
+                         incoming().keys().hasAll([
+                           'userId', 'name', 'documentId', 'address', 'phone', 'clientType',
+                           'withholdingAgent', 'ivaRetentionPercentage', 'islrRetentionPercentage',
+                           'createdAt', 'updatedAt'
+                         ]) &&
+                         incoming().keys().hasOnly([
+                           'userId', 'name', 'documentId', 'address', 'phone', 'clientType',
+                           'withholdingAgent', 'ivaRetentionPercentage', 'islrRetentionPercentage',
+                           'createdAt', 'updatedAt'
+                         ]) &&
+                         isValidServerTimestampsOnCreate(incoming()) &&
+                         isValidCustomer(incoming());
+
+        allow update: if isOwner(userId) &&
+                         isValidId(customerId) &&
+                         isValidCustomer(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         isValidServerTimestampsOnUpdate(incoming()) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly([
+                           'name', 'documentId', 'address', 'phone', 'clientType',
+                           'withholdingAgent', 'ivaRetentionPercentage', 'islrRetentionPercentage', 'updatedAt'
+                         ]);
+
+        allow delete: if isOwner(userId) && isValidId(customerId);
+      }
+
+      // 6. Quotes (Presupuestos)
+      match /quotes/{quoteId} {
+        allow get: if isOwner(userId) && isValidId(quoteId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+                         isValidId(quoteId) &&
+                         incoming().userId == request.auth.uid &&
+                         incoming().keys().hasAll([
+                           'userId', 'quoteNumber', 'customerName', 'customerDocument', 'customerPhone',
+                           'timestampMs', 'validityDays', 'validUntil', 'rateBcv', 'baseTaxableUsd', 'baseExemptUsd',
+                           'ivaUsd', 'discountUsd', 'totalUsd', 'totalBs', 'notesOrConditions', 'status',
+                           'cashierName', 'cashRegisterNumber', 'createdAt', 'updatedAt'
+                         ]) &&
+                         incoming().keys().hasOnly([
+                           'userId', 'quoteNumber', 'customerName', 'customerDocument', 'customerPhone',
+                           'timestampMs', 'validityDays', 'validUntil', 'rateBcv', 'baseTaxableUsd', 'baseExemptUsd',
+                           'ivaUsd', 'discountUsd', 'totalUsd', 'totalBs', 'notesOrConditions', 'status',
+                           'cashierName', 'cashRegisterNumber', 'createdAt', 'updatedAt'
+                         ]) &&
+                         isValidServerTimestampsOnCreate(incoming()) &&
+                         isValidQuote(incoming());
+
+        allow update: if isOwner(userId) &&
+                         isValidId(quoteId) &&
+                         isValidQuote(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         isValidServerTimestampsOnUpdate(incoming()) &&
+                         existing().status != 'ANULADO' &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['status', 'notesOrConditions', 'updatedAt']);
+
+        allow delete: if isOwner(userId) && isValidId(quoteId);
+      }
+
+      // 7. Quote Line Items
+      match /quote_items/{itemId} {
+        allow get: if isOwner(userId) && isValidId(itemId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+                         isValidId(itemId) &&
+                         incoming().userId == request.auth.uid &&
+                         incoming().keys().hasAll([
+                           'userId', 'quoteCloudId', 'productCloudId', 'productName',
+                           'quantity', 'priceUsd', 'taxExempt', 'createdAt', 'updatedAt'
+                         ]) &&
+                         incoming().keys().hasOnly([
+                           'userId', 'quoteCloudId', 'productCloudId', 'productName',
+                           'quantity', 'priceUsd', 'taxExempt', 'createdAt', 'updatedAt'
+                         ]) &&
+                         isValidServerTimestampsOnCreate(incoming()) &&
+                         isValidQuoteItem(incoming());
+
+        allow update: if isOwner(userId) &&
+                         isValidId(itemId) &&
+                         isValidQuoteItem(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         isValidServerTimestampsOnUpdate(incoming()) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['quantity', 'priceUsd', 'updatedAt']);
+
+        allow delete: if isOwner(userId) && isValidId(itemId);
+      }
+
+      // 8. Delivery Notes (Notas de Entrega)
+      match /delivery_notes/{noteId} {
+        allow get: if isOwner(userId) && isValidId(noteId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+                         isValidId(noteId) &&
+                         incoming().userId == request.auth.uid &&
+                         incoming().keys().hasAll([
+                           'userId', 'noteNumber', 'customerName', 'customerDocument', 'recipientName',
+                           'reasonOrObservation', 'timestampMs', 'totalEstimatedUsd', 'totalEstimatedBs',
+                           'rateBcv', 'status', 'cashierName', 'cashRegisterNumber', 'createdAt', 'updatedAt'
+                         ]) &&
+                         incoming().keys().hasOnly([
+                           'userId', 'noteNumber', 'customerName', 'customerDocument', 'recipientName',
+                           'reasonOrObservation', 'timestampMs', 'totalEstimatedUsd', 'totalEstimatedBs',
+                           'rateBcv', 'status', 'cashierName', 'cashRegisterNumber', 'createdAt', 'updatedAt'
+                         ]) &&
+                         isValidServerTimestampsOnCreate(incoming()) &&
+                         isValidDeliveryNote(incoming());
+
+        allow update: if isOwner(userId) &&
+                         isValidId(noteId) &&
+                         isValidDeliveryNote(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         isValidServerTimestampsOnUpdate(incoming()) &&
+                         existing().status != 'ANULADO' &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['status', 'reasonOrObservation', 'updatedAt']);
+
+        allow delete: if isOwner(userId) && isValidId(noteId);
+      }
+
+      // 9. Delivery Note Line Items
+      match /delivery_note_items/{itemId} {
+        allow get: if isOwner(userId) && isValidId(itemId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+                         isValidId(itemId) &&
+                         incoming().userId == request.auth.uid &&
+                         incoming().keys().hasAll([
+                           'userId', 'deliveryNoteCloudId', 'productCloudId', 'productName',
+                           'quantity', 'priceUsd', 'createdAt', 'updatedAt'
+                         ]) &&
+                         incoming().keys().hasOnly([
+                           'userId', 'deliveryNoteCloudId', 'productCloudId', 'productName',
+                           'quantity', 'priceUsd', 'createdAt', 'updatedAt'
+                         ]) &&
+                         isValidServerTimestampsOnCreate(incoming()) &&
+                         isValidDeliveryNoteItem(incoming());
+
+        allow update: if isOwner(userId) &&
+                         isValidId(itemId) &&
+                         isValidDeliveryNoteItem(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         isValidServerTimestampsOnUpdate(incoming()) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['quantity', 'priceUsd', 'updatedAt']);
+
+        allow delete: if isOwner(userId) && isValidId(itemId);
+      }
+
+      // 10. Operating Expenses
+      match /expenses/{expenseId} {
+        allow get: if isOwner(userId) && isValidId(expenseId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+                         isValidId(expenseId) &&
+                         incoming().userId == request.auth.uid &&
+                         incoming().keys().hasAll([
+                           'userId', 'category', 'invoiceNumber', 'amountUsd', 'amountBs', 'bcvRateUsed',
+                           'paymentMethod', 'description', 'timestampMs', 'registeredBy', 'createdAt', 'updatedAt'
+                         ]) &&
+                         incoming().keys().hasOnly([
+                           'userId', 'category', 'invoiceNumber', 'amountUsd', 'amountBs', 'bcvRateUsed',
+                           'paymentMethod', 'description', 'timestampMs', 'registeredBy', 'createdAt', 'updatedAt'
+                         ]) &&
+                         isValidServerTimestampsOnCreate(incoming()) &&
+                         isValidExpense(incoming());
+
+        allow update: if isOwner(userId) &&
+                         isValidId(expenseId) &&
+                         isValidExpense(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         isValidServerTimestampsOnUpdate(incoming()) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly([
+                           'category', 'invoiceNumber', 'amountUsd', 'amountBs', 'paymentMethod', 'description', 'updatedAt'
+                         ]);
+
+        allow delete: if isOwner(userId) && isValidId(expenseId);
+      }
+
+      // 11. Suppliers
+      match /suppliers/{supplierId} {
+        allow get: if isOwner(userId) && isValidId(supplierId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+                         isValidId(supplierId) &&
+                         incoming().userId == request.auth.uid &&
+                         incoming().keys().hasAll(['userId', 'name', 'documentId', 'phone', 'address', 'createdAt', 'updatedAt']) &&
+                         incoming().keys().hasOnly(['userId', 'name', 'documentId', 'phone', 'address', 'createdAt', 'updatedAt']) &&
+                         isValidServerTimestampsOnCreate(incoming()) &&
+                         isValidSupplier(incoming());
+
+        allow update: if isOwner(userId) &&
+                         isValidId(supplierId) &&
+                         isValidSupplier(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         isValidServerTimestampsOnUpdate(incoming()) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['name', 'documentId', 'phone', 'address', 'updatedAt']);
+
+        allow delete: if isOwner(userId) && isValidId(supplierId);
+      }
+
+      // 12. Purchase Invoices
+      match /purchase_invoices/{invoiceId} {
+        allow get: if isOwner(userId) && isValidId(invoiceId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+                         isValidId(invoiceId) &&
+                         incoming().userId == request.auth.uid &&
+                         incoming().keys().hasAll([
+                           'userId', 'supplierCloudId', 'invoiceNumber', 'timestampMs', 'totalAmount', 'description',
+                           'paid', 'paidTimestamp', 'dueDate', 'paymentNotes', 'subtotalUsd', 'taxAmountUsd',
+                           'retencionIvaUsd', 'retencionIvaPercentage', 'retencionIslrUsd', 'retencionIslrPercentage',
+                           'withholdingVoucherNumber', 'withholdingStatus', 'createdAt', 'updatedAt'
+                         ]) &&
+                         incoming().keys().hasOnly([
+                           'userId', 'supplierCloudId', 'invoiceNumber', 'timestampMs', 'totalAmount', 'description',
+                           'paid', 'paidTimestamp', 'dueDate', 'paymentNotes', 'subtotalUsd', 'taxAmountUsd',
+                           'retencionIvaUsd', 'retencionIvaPercentage', 'retencionIslrUsd', 'retencionIslrPercentage',
+                           'withholdingVoucherNumber', 'withholdingStatus', 'createdAt', 'updatedAt'
+                         ]) &&
+                         isValidServerTimestampsOnCreate(incoming()) &&
+                         isValidPurchaseInvoice(incoming());
+
+        allow update: if isOwner(userId) &&
+                         isValidId(invoiceId) &&
+                         isValidPurchaseInvoice(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         isValidServerTimestampsOnUpdate(incoming()) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly([
+                           'paid', 'paidTimestamp', 'paymentNotes',
+                           'withholdingVoucherNumber', 'withholdingStatus', 'updatedAt'
+                         ]);
+
+        allow delete: if isOwner(userId) && isValidId(invoiceId);
+      }
+
+      // 13. POS Terminal Users
+      match /pos_users/{posUserId} {
+        allow get: if isOwner(userId) && isValidId(posUserId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+                         isValidId(posUserId) &&
+                         incoming().userId == request.auth.uid &&
+                         incoming().keys().hasAll(['userId', 'username', 'pin', 'role', 'avatarUrl', 'earnCommission', 'createdAt', 'updatedAt']) &&
+                         incoming().keys().hasOnly(['userId', 'username', 'pin', 'role', 'avatarUrl', 'earnCommission', 'createdAt', 'updatedAt']) &&
+                         isValidServerTimestampsOnCreate(incoming()) &&
+                         isValidPosUser(incoming());
+
+        allow update: if isOwner(userId) &&
+                         isValidId(posUserId) &&
+                         isValidPosUser(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         isValidServerTimestampsOnUpdate(incoming()) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['username', 'pin', 'role', 'avatarUrl', 'earnCommission', 'updatedAt']);
+
+        allow delete: if isOwner(userId) && isValidId(posUserId);
+      }
+
+      // 14. Connected Devices Registry
+      match /devices/{deviceId} {
+        allow get: if isOwner(userId) && isValidId(deviceId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+                         isValidId(deviceId) &&
+                         incoming().userId == request.auth.uid &&
+                         incoming().keys().hasAll(['userId', 'deviceModel', 'googleEmail', 'lastActiveAt', 'createdAt', 'updatedAt']) &&
+                         incoming().keys().hasOnly(['userId', 'deviceModel', 'googleEmail', 'lastActiveAt', 'createdAt', 'updatedAt']) &&
+                         isValidServerTimestampsOnCreate(incoming()) &&
+                         isValidDevice(incoming());
+
+        allow update: if isOwner(userId) &&
+                         isValidId(deviceId) &&
+                         isValidDevice(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         isValidServerTimestampsOnUpdate(incoming()) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['deviceModel', 'googleEmail', 'lastActiveAt', 'updatedAt']);
+
+        allow delete: if isOwner(userId) && isValidId(deviceId);
+      }
+
+      // 15. Encrypted JSON Cloud Backup (Overwritten every 20 minutes at doc 'latest')
+      match /encrypted_backups/{backupId} {
+        allow get: if isOwner(userId) && isValidId(backupId);
+        allow list: if isOwner(userId);
+
+        allow create: if isOwner(userId) &&
+                         isValidId(backupId) &&
+                         incoming().userId == request.auth.uid &&
+                         incoming().keys().hasAll([
+                           'userId', 'googleEmail', 'storeName', 'storeRif', 'deviceId', 'deviceModel',
+                           'formatVersion', 'productsCount', 'salesCount', 'customersCount',
+                           'exportedAtMs', 'encryptedPayload', 'createdAt', 'updatedAt'
+                         ]) &&
+                         incoming().keys().hasOnly([
+                           'userId', 'googleEmail', 'storeName', 'storeRif', 'deviceId', 'deviceModel',
+                           'formatVersion', 'productsCount', 'salesCount', 'customersCount',
+                           'exportedAtMs', 'encryptedPayload', 'createdAt', 'updatedAt'
+                         ]) &&
+                         isValidServerTimestampsOnCreate(incoming()) &&
+                         isValidEncryptedBackup(incoming());
+
+        allow update: if isOwner(userId) &&
+                         isValidId(backupId) &&
+                         isValidEncryptedBackup(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         isValidServerTimestampsOnUpdate(incoming()) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly([
+                           'googleEmail', 'storeName', 'storeRif', 'deviceId', 'deviceModel',
+                           'formatVersion', 'productsCount', 'salesCount', 'customersCount',
+                           'exportedAtMs', 'encryptedPayload', 'updatedAt'
+                         ]);
+
+        allow delete: if isOwner(userId) && isValidId(backupId);
+      }
+    }
+  }
+}
